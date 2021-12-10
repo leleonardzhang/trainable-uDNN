@@ -101,8 +101,8 @@ void train(){
        }
 
        AVG_LOSS = AVG_LOSS >> 4;
-       mse_gradient_descent(&LAYER_1_KERNEL_MAT, &LAYER_1_KERNEL_GRADIENT_MAT, &LAYER_1_BIAS_MAT, &LAYER_1_BIAS_GRADIENT_MAT,  5);
-       mse_gradient_descent(&LAYER_0_KERNEL_MAT, &LAYER_0_KERNEL_GRADIENT_MAT, &LAYER_0_BIAS_MAT, &LAYER_0_BIAS_GRADIENT_MAT,  5);
+       gradient_descent(&LAYER_1_KERNEL_MAT, &LAYER_1_KERNEL_GRADIENT_MAT, &LAYER_1_BIAS_MAT, &LAYER_1_BIAS_GRADIENT_MAT,  5);
+       gradient_descent(&LAYER_0_KERNEL_MAT, &LAYER_0_KERNEL_GRADIENT_MAT, &LAYER_0_BIAS_MAT, &LAYER_0_BIAS_GRADIENT_MAT,  5);
        __no_operation();
     }
 }

@@ -73,7 +73,7 @@ matrix *mse_bias_gradient(matrix *bias_gradient, matrix *delta, int16_t rate, ui
 
 
 
-matrix *mse_gradient_descent(matrix *kernel, matrix *gradient, matrix *bias, matrix *bias_gradient, uint16_t m){
+matrix *gradient_descent(matrix *kernel, matrix *gradient, matrix *bias, matrix *bias_gradient, uint16_t m){
 
     uint16_t i;
     uint16_t kernel_length = kernel->numRows * kernel->numCols;
@@ -122,14 +122,46 @@ matrix *mse_back_propagation(matrix *prev_delta, matrix *kernel, matrix *next_de
 }
 
 
-int16_t cross_entropy_loss(matrix *predict, uint16_t target, uint16_t precision){
+int16_t cce_loss(matrix *predict, uint16_t target, uint16_t precision){
     return -fp_ln(predict->data[target], TAYLOR_SERIES_ITERATIONS, precision);
 }
 
+matrix *cce_kernel_gradient(matrix *gradient, matrix *predict, matrix *input, uint16_t target, int16_t rate, uint16_t precision){
+    int16_t postive_predict_data = predict->data[target];
+    uint16_t input_numRows = input->numRows, input_numCols = input->numCols;
 
+    predict->data[target] -= 1024;
+    input->numRows = input_numCols;
+    input->numCols = input_numRows;
 
+    gradient = matrix_multiply(gradient, predict, input, precision);
 
+    predict->data[target] = postive_predict_data;
+    input->numRows = input_numRows;
+    input->numCols = input_numCols;
 
+    uint16_t i;
 
+    for (i = gradient->numRows * gradient->numCols; i > 0; i --){
+        gradient->data[i - 1] = gradient->data[i - 1] >> rate;
+    }
 
+    return gradient;
+}
 
+matrix *cce_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t target, int16_t rate, uint16_t precision){
+    uint16_t i;
+    for (i = predict->numRows; i > 0; i --){
+        if (i - 1 == target){
+            bias_gradient->data[i - 1] = (predict->data[i - 1] - 1024) >> rate;
+        }
+        else{
+            bias_gradient->data[i - 1] = predict->data[i - 1] >> rate;
+        }
+    }
+    return bias_gradient;
+}
+
+int16_t KL_divergence(matrix *predict, uint16_t target, uint16_t precision){
+    return fp_ln(1024, TAYLOR_SERIES_ITERATIONS, precision) - fp_ln(predict->data[target], TAYLOR_SERIES_ITERATIONS, precision);
+}
