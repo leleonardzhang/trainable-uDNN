@@ -168,7 +168,7 @@ int16_t fp_sigmoid(int16_t x, uint16_t precision) {
 }
 
 int16_t fp_exp(int16_t x, uint16_t i, uint16_t precision){
-    int16_t k = 1, sum = 1024, x_temp = x;
+    int16_t k = 1, sum = (1 << precision), x_temp = x;
     uint16_t j;
     for (j = 1; j < i; j ++){
         k *= j;

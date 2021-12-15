@@ -163,5 +163,5 @@ matrix *cce_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t targe
 }
 
 int16_t KL_divergence(matrix *predict, uint16_t target, uint16_t precision){
-    return fp_ln(1024, TAYLOR_SERIES_ITERATIONS, precision) - fp_ln(predict->data[target], TAYLOR_SERIES_ITERATIONS, precision);
+    return - fp_ln(predict->data[target], TAYLOR_SERIES_ITERATIONS, precision);
 }
