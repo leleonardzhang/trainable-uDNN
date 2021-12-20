@@ -585,11 +585,11 @@ matrix *sparsemax(matrix *result, matrix *vec, uint16_t precision) {
     return result;
 }
 
-matrix *softmax(matrix *result, matrix *input, uint16_t precision, uint16_t shift){
+matrix *softmax(matrix *result, matrix *input, uint16_t precision){
     int16_t sum = 0;
     uint16_t i;
     for (i = input->numRows; i > 0; i --){
-        result->data[i - 1] = fp_exp(input->data[i - 1] >> shift, TAYLOR_SERIES_ITERATIONS, precision - shift);     // shift to avoid overflow
+        result->data[i - 1] = fp_exp(input->data[i - 1] >> 4, TAYLOR_SERIES_ITERATIONS, precision - 4);     // shift to avoid overflow
         sum += result->data[i - 1];
     }
     for (i = input->numRows; i > 0; i --){

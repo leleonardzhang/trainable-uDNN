@@ -162,6 +162,48 @@ matrix *cce_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t targe
     return bias_gradient;
 }
 
+int16_t sparsemax_loss(matrix *predict, uint16_t target, int16_t e, uint16_t precision){
+    int16_t div_result;
+    div_result = fp_div(e + predict->data[target], 1024 + e * predict->numRows, precision);
+    return -fp_ln(div_result, TAYLOR_SERIES_ITERATIONS, precision);
+}
+
+matrix *sparsemax_kernel_gradient(matrix *gradient, matrix *predict, matrix *input, uint16_t target, int16_t rate, uint16_t precision){
+    int16_t positive_predict_data = predict->data[target];
+    uint16_t input_numRows = input->numRows, input_numCols = input->numCols;
+
+    predict->data[target] -= 1024;
+    input->numRows = input_numCols;
+    input->numCols = input_numRows;
+
+    gradient = matrix_multiply(gradient, predict, input, precision);
+
+    predict->data[target] = positive_predict_data;
+    input->numRows = input_numRows;
+    input->numCols = input_numCols;
+
+    uint16_t i;
+
+    for (i = gradient->numRows * gradient->numCols; i > 0; i --){
+        gradient->data[i - 1] = gradient->data[i - 1] >> rate;
+    }
+
+    return gradient;
+}
+
+matrix *sparsemax_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t target, int16_t rate, uint16_t precision){
+    uint16_t i;
+    for (i = predict->numRows; i > 0; i --){
+        if (i - 1 == target){
+            bias_gradient->data[i - 1] = (predict->data[i - 1] - 1024) >> rate;
+        }
+        else{
+            bias_gradient->data[i - 1] = predict->data[i - 1] >> rate;
+        }
+    }
+    return bias_gradient;
+}
+
 int16_t KL_divergence(matrix *predict, uint16_t target, uint16_t precision){
     return - fp_ln(predict->data[target], TAYLOR_SERIES_ITERATIONS, precision);
 }

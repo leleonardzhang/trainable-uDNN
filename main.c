@@ -50,7 +50,8 @@ void main(void){
 //    evaluate(128,256);
 //    mnist_test();
 
-    for (i = 0; i < 32; i ++){
+    for (i = 0; i < 50; i ++){
+
         memset(KERNEL_GRADIENT, 0, sizeof(dtype) * 320);
         memset(BIAS_GRADIENT, 0, sizeof(dtype) * 10);
         LOSS = 0;
@@ -60,14 +61,14 @@ void main(void){
             memcpy(INPUT, &X[(j << 5)], 32);
             memcpy(&TARGET, &Y[j], 1);
 
-
             dense(&OUTPUT_MAT, &INPUT_MAT, &KERNEL_MAT, &BIAS_MAT, &fp_linear, FIXED_POINT_PRECISION);
-            softmax(&ACTIVATION_MAT, &OUTPUT_MAT, FIXED_POINT_PRECISION, 7);
 
-            LOSS += (cce_loss(&ACTIVATION_MAT, TARGET, FIXED_POINT_PRECISION) >> 4);
+            sparsemax(&ACTIVATION_MAT, &OUTPUT_MAT, FIXED_POINT_PRECISION);
 
-            cce_kernel_gradient(&KERNEL_GRADIENT_TEMP_MAT, &ACTIVATION_MAT, &INPUT_MAT, TARGET, 4, FIXED_POINT_PRECISION);
-            cce_bias_gradient(&BIAS_GRADIENT_TEMP_MAT, &ACTIVATION_MAT, TARGET, 4, FIXED_POINT_PRECISION);
+            LOSS += (sparsemax_loss(&ACTIVATION_MAT, TARGET, 1, FIXED_POINT_PRECISION) >> 4);
+
+            sparsemax_kernel_gradient(&KERNEL_GRADIENT_TEMP_MAT, &ACTIVATION_MAT, &INPUT_MAT, TARGET, 3, FIXED_POINT_PRECISION);
+            sparsemax_bias_gradient(&BIAS_GRADIENT_TEMP_MAT, &ACTIVATION_MAT, TARGET, 3, FIXED_POINT_PRECISION);
 
             matrix_add(&KERNEL_GRADIENT_MAT, &KERNEL_GRADIENT_MAT, &KERNEL_GRADIENT_TEMP_MAT);
             matrix_add(&BIAS_GRADIENT_MAT, &BIAS_GRADIENT_MAT, &BIAS_GRADIENT_TEMP_MAT);
@@ -87,7 +88,6 @@ void main(void){
 
         memcpy(INPUT, &X[(j << 5)], 32);
         memcpy(&TARGET, &Y[j], 1);
-
 
         dense(&OUTPUT_MAT, &INPUT_MAT, &KERNEL_MAT, &BIAS_MAT, &fp_linear, FIXED_POINT_PRECISION);
         LABEL = argmax(&OUTPUT_MAT);

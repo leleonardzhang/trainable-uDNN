@@ -36,7 +36,7 @@ matrix *vstack(matrix *result, matrix *mat1, matrix *mat2);
 int16_t dot_product(matrix *vec1, matrix *vec2, uint16_t precision);
 uint16_t *argsort(matrix *vec, uint16_t *result);
 matrix *sparsemax(matrix *result, matrix *vec, uint16_t precision);
-matrix *softmax(matrix *result, matrix *input, uint16_t precision, uint16_t shift);
+matrix *softmax(matrix *result, matrix *input, uint16_t precision);
 
 // Operations useful for various neural network functions
 int16_t argmax(matrix *vec);

@@ -19,5 +19,9 @@ int16_t cce_loss(matrix *predict, uint16_t target, uint16_t precision);
 matrix *cce_kernel_gradient(matrix *gradient, matrix *predict, matrix *input, uint16_t target, int16_t rate, uint16_t precision);
 matrix *cce_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t target, int16_t rate, uint16_t precision);
 
+int16_t sparsemax_loss(matrix *predict, uint16_t target, int16_t e, uint16_t precision);
+matrix *sparsemax_kernel_gradient(matrix *gradient, matrix *predict, matrix *input, uint16_t target, int16_t rate, uint16_t precision);
+matrix *sparsemax_bias_gradient(matrix *bias_gradient, matrix *predict, uint16_t target, int16_t rate, uint16_t precision);
+
 int16_t KL_divergence(matrix *predict, uint16_t target, uint16_t precision);
 #endif /* LAYERS_TRAINABLE_H_ */
